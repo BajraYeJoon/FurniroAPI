@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import path from "path";
 import userRoute from "./routes/user";
+import authRoute from "./routes/auth/auth";
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,7 @@ mongoose
   });
 
 // Routes
+app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 
 app.listen(5000, () => {
