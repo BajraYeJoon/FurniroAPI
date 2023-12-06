@@ -9,6 +9,8 @@ const route: Router = Router();
 // Update
 // ============================
 
+/* The code `route.put()` is defining a route handler for the HTTP PUT method. It specifies the route
+path as `"/:id"`, which means that it expects an `id` parameter in the URL. */
 route.put(
   "/:id",
   verifyTokenAndAuthorization,
@@ -22,6 +24,8 @@ route.put(
 
     try {
       // Update user
+      /* The code `const updatedUser = await User.findByIdAndUpdate(req.params.id, { : req.body }, {
+     new: true });` is updating a user in the database. */
       const updatedUser = await User.findByIdAndUpdate(
         req.params.id,
         {
