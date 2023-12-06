@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import User, { UserDocument } from "../../models/User";
 import { validationResult } from "express-validator";
 import CryptoJS from "crypto-js";
+import jwt from "jsonwebtoken";
 
 const route: Router = Router();
 
@@ -78,10 +79,22 @@ route.post("/login", async (req: Request, res: Response) => {
     if (originalPassword !== req.body.password) {
       return res.status(400).json({ error: "Wrong credentials" });
     }
+
+    // Creating the JWT token & checking if user is admin || not
+    //     && expires   in 3 days
+    const accessToken = jwt.sign(
+      {
+        id: user?._id, // check if user exists before accessing the id
+        isAdmin: user?.isAdmin, // is user admin?
+      },
+      process.env.JWT_SEC!,
+      { expiresIn: "3d" }
+    );
+
     const { password, ...others } = (user as UserDocument)._doc;
 
     // If everything is fine, return user
-    return res.status(200).json(others);
+    return res.status(200).json({ ...others, accessToken });
   } catch (err) {
     console.error("Error during login", err);
     return res.status(500).json({ error: "Internal server error" });
