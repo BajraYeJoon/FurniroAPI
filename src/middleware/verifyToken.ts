@@ -1,20 +1,22 @@
-// import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-// declare module "express-serve-static-core" {
-//   interface Request {
-//     user: any;
-//   }
-// }
-/* The `verifyToken` function is a middleware function that is used to verify the authenticity of a
-JSON Web Token (JWT) provided in the request headers. */
-function verifyToken(req: any, res: any, next: any) {
-  const authHeader = req.headers.token;
+interface CustomRequest extends Request {
+  user?: any;
+}
 
-  /* This code block is responsible for verifying the authenticity of a JSON Web Token (JWT) provided
-  in the request headers. */
+/**
+ * Verify token middleware
+ *
+ */
+function verifyToken(req: CustomRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers.token as string;
+
   if (!authHeader) {
     return res.status(403).json({ error: "No token provided" });
+  }
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(403).json({ error: "Invalid token format" });
   }
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.JWT_SEC!, (err: any, decoded: any) => {
@@ -22,28 +24,67 @@ function verifyToken(req: any, res: any, next: any) {
       return res.status(500).json({ error: "Failed to authenticate token" });
     }
 
-    // Add user to request
     req.user = decoded;
     next();
   });
 }
 
-/* The `export default` statement is used to export the `verifyTokenAndAuthorization` function as the
-default export of the module. This means that when this module is imported into another module, the
-`verifyTokenAndAuthorization` function can be accessed using any name of the developer's choice. */
-export default function verifyTokenAndAuthorization(
-  req: any,
-  res: any,
-  next: any
+// ============================
+// Verify token and authorization
+// ============================
+/**
+ * The function verifies the token and authorization of a request, allowing access if the user ID
+ * matches the requested ID or if the user is an admin.
+ * @param {CustomRequest} req - The `req` parameter is the request object that contains information
+ * about the incoming HTTP request, such as headers, query parameters, and request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties that allow you to manipulate the response,
+ * such as setting headers, sending data, and handling errors.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically called as `next()` to invoke
+ * the next middleware function.
+ */
+export function verifyTokenAndAuthorization(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
 ) {
-  /* The `verifyTokenAndAuthorization` function is a middleware function that is used to verify the
-  authenticity of a JSON Web Token (JWT) provided in the request headers and also checks if the user
-  making the request is authorized to perform the requested action. */
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.isAdmin) {
       next();
     } else {
-      res.status(403).json({ error: "You are not allowed to do that" });
+      handleUnauthorizedRequest(res);
     }
   });
 }
+
+// ============================
+// Verify token and admin
+
+// ============================
+/**
+ * The function `verifyTokenAndAdmin` verifies the token in the request and checks if the user is an
+ * admin, and if so, calls the next middleware function; otherwise, it handles an unauthorized request.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties that allow you to manipulate the response,
+ * such as setting the status code, sending JSON data, or redirecting the client to a different URL.
+ */
+export function verifyTokenAndAdmin(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) {
+  verifyToken(req, res, () => {
+    if (req.user.isAdmin) {
+      next();
+    } else {
+      handleUnauthorizedRequest(res);
+    }
+  });
+}
+
+function handleUnauthorizedRequest(res: Response) {
+  res.status(403).json({ error: "You are not allowed to do that" });
+}
+
+export default verifyTokenAndAdmin;
