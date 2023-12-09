@@ -27,6 +27,7 @@ export const CreateOrderController = async (req: Request, res: Response) => {
     const savedOrder = await newOrder.save();
     res.status(200).json(savedOrder);
   } catch (err) {
+    console.error("Error during order creation", err);
     res.status(500).json(err);
   }
 };

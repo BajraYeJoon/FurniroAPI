@@ -21,7 +21,7 @@ route.get("/", verifyTokenAndAdmin, GetAllOrdersController);
 route.get("/find/:userId", verifyTokenAndAuthorization, GetOrderController);
 
 // Create a new order
-route.post("/", verifyToken, CreateOrderController);
+route.post("/", CreateOrderController);
 
 // Update an order
 route.put("/:id", verifyTokenAndAdmin, UpdateOrderController);
