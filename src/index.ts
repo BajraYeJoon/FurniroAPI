@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import path from "path";
 import userRoute from "./routes/user";
 import authRoute from "./routes/auth/auth";
+import productRoute from "./routes/product";
+import orderRoute from "./routes/order";
+import cartRoute from "./routes/cart";
 
 const app = express();
 app.use(express.json());
@@ -25,6 +28,9 @@ mongoose
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/products", productRoute);
+app.use("/api/orders", orderRoute);
+app.use("/api/carts", cartRoute);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
