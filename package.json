@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "ts-node ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn src/index.ts",
-    "build": "tsc"
+    "dev": "ts-node-dev --respawn src/index.ts"
   },
   "author": "",
   "license": "ISC",
