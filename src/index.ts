@@ -6,8 +6,11 @@ import authRoute from "./routes/auth/auth";
 import productRoute from "./routes/product";
 import orderRoute from "./routes/order";
 import cartRoute from "./routes/cart";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
 import dotenv from "dotenv";
